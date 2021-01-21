@@ -8,19 +8,42 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EventosComponent implements OnInit {
 
-  eventos: any;
+   _filtroLista: string = '';
+  get filtroLista(): string{
+    return this._filtroLista;
+  }
+  set filtroLista(value: string){
+    this._filtroLista = value;
+    this.eventosFiltrados = this.filtroLista ? this.filtrarEventos(this.filtroLista) : this.eventos;
+  }
+  eventosFiltrados: any = [];
+  eventos: any = [];
+  imagemLargura = 50;
+  imagemMargem = 2;
+  mostrarImagem = false;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.getEventos();
-    //this.eventos = [{"eventoId":1,local:"Belo Horizonte","dataEvento":"21/01/2019",tema:"Angular e suas particularidades","qtdPessoas":350,"lote":"1º Lote","imagemURL":null},{"eventoId":2,"local":"Uberaba","dataEvento":"25/01/2020","tema":".dot Net e suas particularidades","qtdPessoas":451,"lote":"2º Lote","imagemURL":null}];
+  }
+
+  filtrarEventos(filtrarPor:string): any {
+    filtrarPor = filtrarPor.toLocaleLowerCase();
+    return this.eventos.filter(
+      (e:any) => e.tema.toLocaleLowerCase().indexOf(filtrarPor) != -1
+    );
+  }
+
+
+  alternarImagem(){
+    this.mostrarImagem = !this.mostrarImagem;
   }
 
   getEventos(){
     this.eventos = this.http.get("http://localhost:5000/api/values").subscribe(
       response => { 
-        this.eventos = response;
+        this.eventosFiltrados = this.eventos = response;
         console.log(response);
       }, error => {
         console.log(error);
